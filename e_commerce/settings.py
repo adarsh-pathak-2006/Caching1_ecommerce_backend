@@ -37,6 +37,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'accounts', 'cart',
+    'core', 'orders',
+    'products', 'review',
 ]
 
 MIDDLEWARE = [
@@ -66,7 +70,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'e_commerce.wsgi.application'
+# WSGI_APPLICATION = 'e_commerce.wsgi.application'
+ASGI_APPLICATION = 'e_commerce.asgi.application'
 
 
 # Database
