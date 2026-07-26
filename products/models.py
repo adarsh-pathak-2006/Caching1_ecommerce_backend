@@ -1,7 +1,4 @@
 from django.db import models
-from django.conf import settings
-
-User=settings.AUTH_USER_MODEL
 
 class Category(models.Model):
     name=models.CharField(max_length=50)
@@ -28,6 +25,13 @@ class Product(models.Model):
     is_avaliable=models.BooleanField(default=False)
     created_at=models.DateTimeField(auto_now_add=True)
     updated_at=models.DateField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.stock == 0:
+            self.is_avaliable = False
+        else:
+            self.is_avaliable = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
