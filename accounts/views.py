@@ -6,6 +6,11 @@ from accounts.serializers import RegisterUSerSerializer, ProfileUpdateSerializer
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.permissions import IsAuthenticated
+from e_commerce.permissions import IsAdmin, IsCustomer
+
+# class CustomTokenObtainAPI(TokenObtainPairView)
 
 User=get_user_model()
 
@@ -32,6 +37,7 @@ class RegisterAPI(APIView):
             return Response(serial.errors, status=400)
 
 class MyProfileAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
         serial=ProfileUpdateSerializer(profile_data)
@@ -47,10 +53,12 @@ class MyProfileAPI(APIView):
             return Response(serial.errors, status=400)     
 
 class AllProfiles(ListAPIView):
+    permission_classes=[IsAuthenticated]
     queryset=Profile.objects.all()
     serializer_class=ProfileGetSerializer
 
 class AllProfileIndividual(RetrieveUpdateDestroyAPIView):
+    permission_classes=[IsAdmin]
     queryset=Profile.objects.all()
     serializer_class=ProfileUpdateSerializer
 

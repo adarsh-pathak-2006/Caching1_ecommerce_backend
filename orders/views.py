@@ -5,9 +5,12 @@ from rest_framework.views import APIView
 from accounts.models import Profile
 from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
+from e_commerce.permissions import IsAdmin
 
 
 class MyOrderAPI(ListCreateAPIView):
+    permission_classes=[IsAuthenticated]        
     serializer_class=OrderSerializer
     def get_queryset(self):
         profile_data=get_object_or_404(Profile, user=self.request.user)
@@ -18,6 +21,7 @@ class MyOrderAPI(ListCreateAPIView):
         serializer.save(user=profile_data)
 
 class MyOrderAPIIndividual(RetrieveAPIView):
+    permission_classes=[IsAuthenticated]
     serializer_class=OrderSerializer
 
     def get_queryset(self):
@@ -25,14 +29,17 @@ class MyOrderAPIIndividual(RetrieveAPIView):
         return Order.objects.filter(user=profile_data)
 
 class AllOrdersAPI(ListAPIView):
+    permission_classes=[IsAdmin]
     queryset=Order.objects.all()
     serializer_class=OrderSerializer
 
 class AllOrderAPIIndividual(RetrieveUpdateDestroyAPIView):
+    permission_classes=[IsAdmin]
     queryset=Order.objects.all()
     serializer_class=OrderSerializer
 
 class OrderItemsAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, pk):
         profile_data=get_object_or_404(Profile, user=self.request.user)
         order_data=get_object_or_404(Order, user=profile_data, id=pk)

@@ -5,9 +5,11 @@ from products.models import Product
 from accounts.models import Profile
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 
 class ReviewSerializer(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, slug):
         product_data=get_object_or_404(Product, slug=slug)
         data=Review.objects.filter(product=product_data)
@@ -24,6 +26,7 @@ class ReviewSerializer(APIView):
             return Response(serial.errors, status=400)
 
 class ReviewIndividualAPI(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self, request, slug, pk):
         product_data=get_object_or_404(Product, slug=slug)
         profile_data=get_object_or_404(Profile, user=request.user)
