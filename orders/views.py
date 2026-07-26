@@ -2,11 +2,11 @@ from django.shortcuts import get_object_or_404
 from orders.models import Order
 from orders.serializers import OrderSerializer
 from accounts.models import Profile
-from rest_framework.generics import RetrieveAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from e_commerce.permissions import IsAdmin
-from e_commerce.throttle import GeneralAPIsThrottle
+from e_commerce.throttle import GeneralAPIsThrottle, OrderRelatedThrottle
 from django.db import models
 from cart.models import Cart, CartItem
 from rest_framework.response import Response
@@ -21,6 +21,8 @@ class MyOrderAPI(ListAPIView):
         return Order.objects.filter(user=profile_data)
 
 class OrderCreationAPI(APIView):
+    throttle_classes=[OrderRelatedThrottle]
+    permission_classes=[IsAuthenticated]
     def post(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
         cart_data=get_object_or_404(Cart, profile=profile_data)
@@ -35,9 +37,14 @@ class OrderCreationAPI(APIView):
         else:
             return Response(serial.errors, status=400)                
 
-class MyOrderAPIIndividual(RetrieveAPIView):
-    throttle_classes=[GeneralAPIsThrottle]
-    permission_classes=[IsAuthenticated]
+class MyOrderAPIIndividual(RetrieveUpdateAPIView):
+    throttle_classes=[OrderRelatedThrottle]
+    def get_permissions(self):
+        if self.request.method=="PUT":
+            return [IsAdmin()]
+        else:
+            return [IsAuthenticated()]
+        
     serializer_class=OrderSerializer
 
     def get_queryset(self):

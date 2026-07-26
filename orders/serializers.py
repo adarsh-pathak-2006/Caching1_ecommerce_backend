@@ -9,6 +9,7 @@ class OrderSerializer(ModelSerializer):
     class Meta:
         model=Order
         fields='__all__'
+        read_only_fields=['final_amount']
 
 class OrderGetSerializer(ModelSerializer):
     class Meta:
