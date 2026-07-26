@@ -29,7 +29,7 @@ class OrderItem(models.Model):
         constraints=[models.UniqueConstraint(fields=['order', 'item'],name='unique_product_per_order_constraint')]
 
     def save(self, *args, **kwargs):
-        self.sub_total = self.price + self.quantity
+        self.sub_total = self.price * self.quantity
         super().save(*args, **kwargs)
 
     def __str__(self):
