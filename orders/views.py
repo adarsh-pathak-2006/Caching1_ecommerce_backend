@@ -1,16 +1,14 @@
 from django.shortcuts import get_object_or_404
-from orders.models import OrderItem, Order
-from orders.serializers import OrderSerializer, OrderItemSerializer
-from rest_framework.views import APIView
+from orders.models import Order
+from orders.serializers import OrderSerializer
 from accounts.models import Profile
-from rest_framework.response import Response
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 from e_commerce.permissions import IsAdmin
 from e_commerce.throttle import GeneralAPIsThrottle
 
 
-class MyOrderAPI(ListCreateAPIView):
+class MyOrderAPI(ListAPIView):
     throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]        
     serializer_class=OrderSerializer
@@ -43,32 +41,5 @@ class AllOrderAPIIndividual(RetrieveUpdateDestroyAPIView):
     queryset=Order.objects.all()
     serializer_class=OrderSerializer
 
-class OrderItemsAPI(APIView):
-    throttle_classes=[GeneralAPIsThrottle]
-    permission_classes=[IsAuthenticated]
-    def get(self, request, pk):
-        profile_data=get_object_or_404(Profile, user=self.request.user)
-        order_data=get_object_or_404(Order, user=profile_data, id=pk)
-        data=OrderItem.objects.filter(order=order_data)
-        serial=OrderItemSerializer(data, many=True)
-        return Response(serial.data, status=200)
-
-    def patch(self ,request, pk):
-        profile_data=get_object_or_404(Profile, user=self.request.user)
-        order_data=get_object_or_404(Order, user=profile_data, id=pk)
-        instance=OrderItem.objects.filter(order=order_data)
-        serial=OrderItemSerializer(instance, data=request.data, partial=True)
-        if serial.is_valid():
-            serial.save()
-            return Response(serial.data, status=200)
-        else:
-            return Response(serial.errors, status=400)
-
-    def delete(self, request, pk):
-        profile_data=get_object_or_404(Profile, user=self.request.user)
-        order_data=get_object_or_404(Order, user=profile_data, id=pk)
-        instance=OrderItem.objects.filter(order=order_data)
-        instance.delete()
-        return Response({ 'message':'data deleted successfully' }, status=204)
 
     
