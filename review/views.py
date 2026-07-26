@@ -35,9 +35,9 @@ class ReviewIndividualAPI(APIView):
         product_data=get_object_or_404(Product, slug=slug)
         profile_data=get_object_or_404(Profile, user=request.user)
         instance=get_object_or_404(Review, product=product_data, id=pk, user=profile_data)
-        serial=ReviewSerializer(instance, data=request.data)
+        serial=ReviewSerializer(instance, data=request.data, partial=True)
         if serial.is_valid():
-            serial.save(partial=True)
+            serial.save()
             return Response(serial.data, status=200)
         else:
             return Response(serial.errors, status=400)
