@@ -6,9 +6,11 @@ from accounts.models import Profile
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from e_commerce.throttle import GeneralAPIsThrottle
 
 
 class ReviewSerializer(APIView):
+    throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request, slug):
         product_data=get_object_or_404(Product, slug=slug)
@@ -26,6 +28,7 @@ class ReviewSerializer(APIView):
             return Response(serial.errors, status=400)
 
 class ReviewIndividualAPI(APIView):
+    throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request, slug, pk):
         product_data=get_object_or_404(Product, slug=slug)

@@ -6,16 +6,21 @@ from accounts.serializers import RegisterUSerSerializer, ProfileUpdateSerializer
 from rest_framework.response import Response
 from django.db.models import Q
 from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
-from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework.permissions import IsAuthenticated
-from e_commerce.permissions import IsAdmin, IsCustomer
-
-# class CustomTokenObtainAPI(TokenObtainPairView)
+from e_commerce.permissions import IsAdmin
+from e_commerce.throttle import RegisterThrottle, TokenObtainThrottle, TokenRefreshThrottle, GeneralAPIsThrottle
 
 User=get_user_model()
 
+class CustomTokenObtainAPI(TokenObtainPairView):
+    throttle_classes=[TokenObtainThrottle]
+
+class CustomTokenRefreshAPI(TokenRefreshView):
+    throttle_classes=[TokenRefreshThrottle]
 
 class RegisterAPI(APIView):
+    throttle_classes=[RegisterThrottle]
     def post(self, request):
         serial=RegisterUSerSerializer(data=request.data)
         if serial.is_valid():
@@ -37,6 +42,7 @@ class RegisterAPI(APIView):
             return Response(serial.errors, status=400)
 
 class MyProfileAPI(APIView):
+    throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request):
         profile_data=get_object_or_404(Profile, user=request.user)
@@ -53,11 +59,13 @@ class MyProfileAPI(APIView):
             return Response(serial.errors, status=400)     
 
 class AllProfiles(ListAPIView):
+    throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]
     queryset=Profile.objects.all()
     serializer_class=ProfileGetSerializer
 
 class AllProfileIndividual(RetrieveUpdateDestroyAPIView):
+    throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAdmin]
     queryset=Profile.objects.all()
     serializer_class=ProfileUpdateSerializer
