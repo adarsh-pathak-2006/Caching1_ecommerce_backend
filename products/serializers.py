@@ -11,3 +11,8 @@ class ProductSerializer(ModelSerializer):
     class Meta:
         model=Product
         fields='__all__'
+
+class ProductGetSerializer(ModelSerializer):
+    class Meta:
+        model=Product
+        fields=['name', 'description', 'price', 'stock', 'sku']
