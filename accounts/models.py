@@ -19,7 +19,7 @@ class Profile(models.Model):
     state=models.CharField(max_length=20, blank=True, null=True)
     postal_code=models.CharField(max_length=6, blank=True, null=True)
     created_at=models.DateTimeField(auto_now_add=True)
-    updated_at=models.DateField(blank=True, null=True)
+    updated_at=models.DateField(auto_now=True)
 
     def __str__(self):
         return self.full_name

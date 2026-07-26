@@ -1,3 +1,56 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from rest_framework.views import APIView
+from accounts.models import Profile
+from django.contrib.auth import get_user_model
+from accounts.serializers import RegisterUSerSerializer, ProfileUpdateSerializer, ProfileGetSerializer
+from rest_framework.response import Response
+from django.db.models import Q
+from rest_framework.generics import ListAPIView, RetrieveUpdateDestroyAPIView
 
-# Create your views here.
+User=get_user_model()
+
+
+class RegisterAPI(APIView):
+    def post(self, request):
+        serial=RegisterUSerSerializer(data=request.data)
+        if serial.is_valid():
+            f_name=serial.validated_data.get('first_name', '')
+            l_name=serial.validated_data.get('last_name', '')
+            username=serial.validated_data['username']
+            email=serial.validated_data['email']
+            mobile_no=serial.validated_data['phone_number']
+            password=serial.validated_data['password']
+            role=serial.validated_data['role']
+
+            if User.objects.filter(Q(username=username) | Q(phone_number=mobile_no) | Q(email=email)).exists():
+                return Response({ 'message':'credentials for the user already exists' }, status=400)
+            else:
+                user_created=User.objects.create_user(first_name=f_name, last_name=l_name, username=username, email=email, phone_number=mobile_no, password=password, role=role)
+                Profile.objects.create(user=user_created)
+                return Response({ 'message':'user registered successfully' }, status=201)
+        else:
+            return Response(serial.errors, status=400)
+
+class MyProfileAPI(APIView):
+    def get(self, request):
+        profile_data=get_object_or_404(Profile, user=request.user)
+        serial=ProfileUpdateSerializer(profile_data)
+        return Response(serial.data, status=200)
+
+    def patch(self, request):
+        profile_data=get_object_or_404(Profile, user=request.user)
+        serial=ProfileUpdateSerializer(profile_data, data=request.data, partial=True)
+        if serial.is_valid():
+            serial.save()
+            return Response(serial.data, status=200)
+        else:
+            return Response(serial.errors, status=400)     
+
+class AllProfiles(ListAPIView):
+    queryset=Profile.objects.all()
+    serializer_class=ProfileGetSerializer
+
+class AllProfileIndividual(RetrieveUpdateDestroyAPIView):
+    queryset=Profile.objects.all()
+    serializer_class=ProfileUpdateSerializer
+
