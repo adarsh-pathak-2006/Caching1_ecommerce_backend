@@ -10,7 +10,7 @@ class Order(models.Model):
     tax=models.PositiveIntegerField()
     shipping_charges=models.PositiveIntegerField()
     final_amount=models.PositiveIntegerField()
-    payment_method=models.CharField(max_length=15, choices=[('CARD', 'Card'), ('CASH ON DELIVERY', 'Cash on Delivery'), ('UPI', 'UPI')])
+    payment_method=models.CharField(max_length=20, choices=[('CARD', 'Card'), ('CASH ON DELIVERY', 'Cash on Delivery'), ('UPI', 'UPI')])
     payment_status=models.CharField(max_length=10, choices=[('PENDING', 'Pending'), ('COMPLETED', 'Completed')], default='PENDING')
     order_status=models.CharField(max_length=50, choices=[('RECIEVED', 'Recieved'), ('OUT_FOR_DELIVERY', 'Out_for_delivery'), ('DELIVERED', 'Delivered'), ('CANCELED', 'Canceled')])
     created_at=models.DateTimeField(auto_now_add=True)

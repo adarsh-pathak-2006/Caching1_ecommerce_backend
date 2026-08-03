@@ -6,7 +6,7 @@ from products.serializers import ProductGetSerializer
 
 
 class CartItemwriteSerializer(ModelSerializer):
-    product=PrimaryKeyRelatedField(Product.objects.all())
+    product=PrimaryKeyRelatedField(queryset=Product.objects.all())
     class Meta:
         model=CartItem
         fields='__all__'
