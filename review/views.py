@@ -9,7 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 from e_commerce.throttle import GeneralAPIsThrottle
 
 
-class ReviewSerializer(APIView):
+class ReviewAPI(APIView):
     throttle_classes=[GeneralAPIsThrottle]
     permission_classes=[IsAuthenticated]
     def get(self, request, slug):
