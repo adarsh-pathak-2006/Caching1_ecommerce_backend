@@ -19,6 +19,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from accounts.views import RegisterAPI, CustomTokenObtainAPI, CustomTokenRefreshAPI
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +30,9 @@ urlpatterns = [
     path('cartapis/', include('cart.urls')),
     path('productapis/', include('products.urls')),
     path('reviewapis/', include('review.urls')),
+    path('register/', RegisterAPI.as_view(), name='register'),
+    path('api/token/', CustomTokenObtainAPI.as_view(), name='token_obtain'),
+    path('api/token/refresh/', CustomTokenRefreshAPI.as_view(), name='token_refresh'),
 ]
 
 if settings.DEBUG:
