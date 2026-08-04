@@ -24,13 +24,14 @@ class CategoryAPI(APIView):
             return Response(cached_data, status=200)
         data=Category.objects.all()
         serial=CategorySerializer(data, many=True)
+        cache.set("categories", serial.data, timeout=500)
         return Response(serial.data, status=200)
 
     def post(self, request):
         serial=CategorySerializer(data=request.data)
         if serial.is_valid():
             serial.save()
-            cache.set("categories", serial.data, timeout=500)
+            cache.delete("categories")
             return Response(serial.data, status=201)
         else:
             return Response(serial.errors, status=400)
@@ -50,13 +51,15 @@ class CategoryIndividualAPI(APIView):
             return Response(cached_data, status=200)
         data=get_object_or_404(Category, slug=slug)
         serial=CategorySerializer(data)
-        return Response(serial, status=200)
+        cache.set(f"category_{slug}", serial.data, timeout=500)
+        return Response(serial.data, status=200)
 
     def patch(self, request, slug):
         instance=get_object_or_404(Category, slug=slug)
         serial=CategorySerializer(instance, data=request.data, partial=True)
         if serial.is_valid():
             cache.delete(f"category_{slug}")
+            cache.delete("categories")
             serial.save()
             return Response(serial.data)
 
@@ -64,6 +67,7 @@ class CategoryIndividualAPI(APIView):
         data=get_object_or_404(Category, slug=slug)
         data.delete()
         cache.delete(f"category_{slug}")
+        cache.delete("categories")
 
 class ProductAPI(APIView):
     throttle_classes=[GeneralAPIsThrottle]
@@ -78,13 +82,14 @@ class ProductAPI(APIView):
             return Response(cached_data, status=200)
         data=Product.objects.all()
         serial=ProductSerializer(data, many=True)
+        cache.set("products", serial.data, timeout=500)
         return Response(serial.data, status=200)
 
     def post(self, request):
         serial=ProductSerializer(data=request.data)
         if serial.is_valid():
             serial.save()
-            cache.set("products", serial.data, timeout=500)
+            cache.delete("products")
             return Response(serial.data, status=201)
         else:
             return Response(serial.errors, status=400)
@@ -102,13 +107,15 @@ class ProductIndividualAPI(APIView):
             return Response(cached_data, status=200)
         data=get_object_or_404(Product, slug=slug)
         serial=ProductSerializer(data)
-        return Response(serial, status=200)
+        cache.set(f"product_{slug}", serial.data, timeout=500)
+        return Response(serial.data, status=200)
 
     def patch(self, request, slug):
         instance=get_object_or_404(Product, slug=slug)
         serial=ProductSerializer(instance, data=request.data, partial=True)
         if serial.is_valid():
             cache.delete(f"product_{slug}")
+            cache.delete("products")
             serial.save()
             return Response(serial.data)
 
@@ -116,3 +123,4 @@ class ProductIndividualAPI(APIView):
         data=get_object_or_404(Product, slug=slug)
         data.delete()
         cache.delete(f"product_{slug}")
+        cache.delete("products")

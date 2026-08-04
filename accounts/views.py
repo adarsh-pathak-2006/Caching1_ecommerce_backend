@@ -32,12 +32,13 @@ class RegisterAPI(APIView):
             password=serial.validated_data['password']
             role=serial.validated_data['role']
 
-            if User.objects.filter(Q(username=username) | Q(phone_number=mobile_no) | Q(email=email)).exists():
-                return Response({ 'message':'credentials for the user already exists' }, status=400)
-            else:
+            from django.db import IntegrityError
+            try:
                 user_created=User.objects.create_user(first_name=f_name, last_name=l_name, username=username, email=email, phone_number=mobile_no, password=password, role=role)
                 Profile.objects.create(user=user_created)
                 return Response({ 'message':'user registered successfully' }, status=201)
+            except IntegrityError:
+                return Response({ 'message':'credentials for the user already exists' }, status=400)
         else:
             return Response(serial.errors, status=400)
 

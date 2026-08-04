@@ -6,8 +6,9 @@ class User(AbstractUser):
         ('CUSTOMER', 'Customer'),
         ('ADMIN', 'Admin')
     ]
+    email = models.EmailField(unique=True)
     role=models.CharField(max_length=8, choices=ROLE_CHOICE)
-    phone_number=models.CharField(max_length=15)
+    phone_number=models.CharField(max_length=15, unique=True)
 
 class Profile(models.Model):
     user=models.OneToOneField(User, on_delete=models.CASCADE)
